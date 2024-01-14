@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include "lab1_IO.h"
 #include "timer.h"
+#include <stdlib.h>
 
 struct mult_job {
     int ***A;
@@ -25,8 +26,10 @@ void compute_block(void* param) {
     int cell_per_block = job->cell_per_block;
     for (int i = 0; i < cell_per_block; i++) {
         for (int j = 0; j < cell_per_block; j++) {
-            int* c = &((*job->C)[job->x * cell_per_block + i][job->y * cell_per_block + j]);
-            compute_cell(job->A, job->B, c, job->x * cell_per_block + i, job->y * cell_per_block + j, job->n);
+            int c_i = job->x * cell_per_block + i;
+            int c_j = job->y * cell_per_block + j;
+            int* c = &((*job->C)[c_i][c_j]);
+            compute_cell(job->A, job->B, c, c_i, c_j, job->n);
         }
     }
 }
