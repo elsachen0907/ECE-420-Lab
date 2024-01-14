@@ -34,8 +34,34 @@ void compute_block(void* param) {
     }
 }
 
-int main(int narg, char** agrv) {
-    int p = atoi(agrv[1]);
+void run_serial_computation() {
+    int n;
+    int** A;
+    int** B;
+    Lab1_loadinput(&A, &B, &n);
+
+    int** C;
+    C = malloc(n * sizeof(int*));
+    for (int i = 0; i < n; i++) {
+      C[i] = malloc(n * sizeof(int));
+    }
+
+    double start_time;
+    GET_TIME(start_time);
+
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            compute_cell(&A, &B, &C[i][j], i, j, n);
+        }
+    }
+
+    double end_time;
+    GET_TIME(end_time);
+
+    Lab1_saveoutput(C, &n, end_time - start_time);
+}
+
+void run_parallel_computation(int p) {
     int p_sqrt = (int)(sqrt((double)p));
 
     int n;
@@ -81,6 +107,16 @@ int main(int narg, char** agrv) {
     GET_TIME(end_time);
 
     Lab1_saveoutput(C, &n, end_time - start_time);
+}
+
+int main(int narg, char** agrv) {
+    int p = atoi(agrv[1]);
+
+    if (p == -1) {
+        run_serial_computation();
+    } else {
+        run_parallel_computation(p);
+    }
 
     return 0;
 }
