@@ -7,6 +7,15 @@
 #include<unistd.h>
 #include<pthread.h>
 
+/**
+ * TODO:
+ * 1. Handle multithreaded client (default=100)
+ * 2. Create array of n strings
+ * 3. Parse request and call read or write function
+ * 4. Implement read and write function
+ * 5. Implement a better parallelization than mutex
+*/
+
 void *ServerEcho(void *args)
 {
     int clientFileDescriptor=(int)args;
