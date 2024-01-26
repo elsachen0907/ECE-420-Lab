@@ -58,7 +58,7 @@ int main(int argc, char* argv[])
         listen(serverFileDescriptor,2000); 
         while(1)        //loop infinity
         {
-            for(i=0;i<COM_CLIENT_THREAD_COUNT;i++)
+            for(i=0;i<COM_NUM_REQUEST;i++)
             {
                 clientFileDescriptor=accept(serverFileDescriptor,NULL,NULL);
                 printf("Connected to client %d\n",clientFileDescriptor);
