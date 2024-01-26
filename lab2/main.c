@@ -10,15 +10,16 @@
 
 /**
  * TODO:
- * 0. Read input
- * 1. Handle multithreaded client (default=100)
- * 2. Create array of n strings
+ * 0. Read input √
+ * 1. Handle multithreaded client (default=100) √
+ * 2. Create array of n strings √
  * 3. Parse request and call read or write function
  * 4. Implement read and write function
  * 5. Implement a better parallelization than mutex
 */
 
 int NUM_STR_;
+char **theArray; 
 
 void *Process(void *args)
 {
@@ -35,9 +36,18 @@ int main(int argc, char* argv[])
     int i;
     pthread_t t[COM_CLIENT_THREAD_COUNT];
 
+    // Read command-line arguments
     NUM_STR_ = strtol(argv[1], NULL, 10);
     char *server_ip = argv[2];
     int server_port = strtol(argv[3], NULL, 10);
+
+    // Initialize array of strings
+    theArray = (char**) malloc(NUM_STR_ * sizeof(char*));
+    for (i = 0; i < NUM_STR_; i ++){
+        theArray[i] = (char*) malloc(COM_BUFF_SIZE * sizeof(char));
+        sprintf(theArray[i], "theArray[%d]: initial value", i);
+        printf("%s\n\n", theArray[i]);
+    }
 
     sock_var.sin_addr.s_addr=inet_addr(server_ip);
     sock_var.sin_port=server_port;
