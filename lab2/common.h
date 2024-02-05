@@ -5,7 +5,7 @@
 
 /* Important parameters */
 // Change these if needed
-#define COM_IS_VERBOSE 0 // 0 off; 1 on
+#define COM_IS_VERBOSE 1 // 0 off; 1 on
 // Do not change the following for your final testing and submitted version
 #define COM_NUM_REQUEST 1000 // Number of total request
                     // For ease of implementation, prepare this many threads in server to handle the request
