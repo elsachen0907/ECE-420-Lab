@@ -1,1 +1,7 @@
 .vscode/
+
+main
+client
+attacker
+
+server_output_time_aggregated

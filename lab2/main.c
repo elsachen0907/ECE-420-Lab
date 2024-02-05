@@ -8,16 +8,7 @@
 #include<pthread.h>
 
 #include "common.h"
-
-/**
- * TODO:
- * 0. Read input √
- * 1. Handle multithreaded client (default=100) √
- * 2. Create array of n strings √
- * 3. Parse request and call read or write function
- * 4. Implement read and write function
- * 5. Implement a better parallelization than mutex
-*/
+#include "timer.h"
 
 int theLen;
 char** theArray;
@@ -27,51 +18,42 @@ pthread_mutex_t nextClientMutex;
 pthread_cond_t handlerIsIdleCond;
 pthread_cond_t incomingClientCond;
 
-int incomingClient = NULL;
-int idleHandlers = 0;
+int clients[COM_NUM_REQUEST];
+double times[COM_NUM_REQUEST];
 
-void* handle(void*)
+void* handle(void* vid)
 {
-    int clientSocket;
+    int id = (int)vid;
+    int clientSocket = clients[id];
     char str[COM_BUFF_SIZE];
     ClientRequest req;
 
-    while (1) {
-        pthread_mutex_lock(&nextClientMutex);
-        while (incomingClient == NULL) {
-            idleHandlers++;
-            pthread_cond_signal(&handlerIsIdleCond);
-            pthread_cond_wait(&incomingClientCond, &nextClientMutex);
-            idleHandlers--;
-        }
+    double start, end;
 
-        clientSocket = incomingClient;
-        incomingClient = NULL;
+    read(clientSocket, str, COM_BUFF_SIZE);
+    ParseMsg(&str, &req);
+    GET_TIME(start);
 
-        pthread_mutex_unlock(&nextClientMutex);
-
-        read(clientSocket, str, COM_BUFF_SIZE);
-        ParseMsg(&str, &req);
-
-        char out[COM_BUFF_SIZE];
-        if (req.is_read > 0) {
-            pthread_rwlock_rdlock(&(theLocks[req.pos]));
-        } else {
-            pthread_rwlock_wrlock(&(theLocks[req.pos]));
-        }
-
-        getContent(out, req.pos, theArray);
-
-        if (req.is_read == 0) {
-            setContent(req.msg, req.pos, theArray);
-        }
-
-        pthread_rwlock_unlock(&(theLocks[req.pos]));
-
-        write(clientSocket, out, COM_BUFF_SIZE);
-        close(clientSocket);
-
+    char out[COM_BUFF_SIZE];
+    if (req.is_read > 0) {
+        pthread_rwlock_rdlock(&(theLocks[req.pos]));
+    } else {
+        pthread_rwlock_wrlock(&(theLocks[req.pos]));
     }
+
+    getContent(out, req.pos, theArray);
+
+    if (req.is_read == 0) {
+        setContent(req.msg, req.pos, theArray);
+    }
+
+    pthread_rwlock_unlock(&(theLocks[req.pos]));
+
+    GET_TIME(end);
+    write(clientSocket, out, COM_BUFF_SIZE);
+    close(clientSocket);
+
+    times[id] = end - start;
     return NULL;
 }
 
@@ -90,11 +72,13 @@ int main(int argc, char* argv[])
         pthread_rwlock_init(&(theLocks[i]), NULL);
     }
 
+    // Initialize the mutex and conditions
+    pthread_mutex_init(&nextClientMutex, NULL);
+    pthread_cond_init(&handlerIsIdleCond, NULL);
+    pthread_cond_init(&incomingClientCond, NULL);
+
     // Initialize the threads
     pthread_t* t = malloc(COM_NUM_REQUEST*sizeof(pthread_t));
-    for (int i = 0; i < COM_NUM_REQUEST; i++) {
-        pthread_create(&t[i], NULL, handle, NULL);
-    }
 
     // Initialize socket info
     struct sockaddr_in sock_var;
@@ -114,18 +98,20 @@ int main(int argc, char* argv[])
         printf("Failed to bind socket - exiting\n");
     }
 
-    listen(hostSocket,2000);
+    listen(hostSocket, 2000);
     while (1) {
-        int next = accept(hostSocket, NULL, NULL);
+        double times[COM_NUM_REQUEST];
 
-        pthread_mutex_lock(&nextClientMutex);
-        while (idleHandlers <= 0) {
-            pthread_cond_wait(&handlerIsIdleCond, &nextClientMutex);
+        for (int i = 0; i < COM_NUM_REQUEST; i++) {
+            clients[i] = accept(hostSocket, NULL, NULL);
+            pthread_create(&t[i], NULL, handle, (void*)i);
         }
 
-        incomingClient = next;
-        pthread_cond_signal(&incomingClientCond);
-        pthread_mutex_unlock(&nextClientMutex);
+        for (int i = 0; i < COM_NUM_REQUEST; i++) {
+            pthread_join(t[i], NULL);
+        }
+
+        saveTimes(times, COM_NUM_REQUEST);
     }
     close(hostSocket);
     return 0;
