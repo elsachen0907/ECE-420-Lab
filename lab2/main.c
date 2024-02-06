@@ -100,7 +100,6 @@ int main(int argc, char* argv[])
 
     listen(hostSocket, 2000);
     while (1) {
-        double times[COM_NUM_REQUEST];
 
         for (int i = 0; i < COM_NUM_REQUEST; i++) {
             clients[i] = accept(hostSocket, NULL, NULL);
