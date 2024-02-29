@@ -1,0 +1,19 @@
+Readme for ECE 420 Lab3 Script Kit
+Feb. 2024
+
+=====
+Overview:
+    There are two groups of scripts in this kit
+
+-----
+    Data generating program:
+    datagen.c      source file for the input date generation program
+
+-----
+    Important functions:
+    timer.h        macro definition for the time measurement
+    Lab3IO.h       header for the Lab3IO.c, needs to be included if call the IOs directly from Lab3IO.c
+    Lab3IO.c       source file for the IO functions, needs to be referred in the compiler line if the functions are called in the program
+=====
+Please also find the detailed instructions in the comments of the individual files.
+
