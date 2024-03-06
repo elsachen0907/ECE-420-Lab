@@ -40,16 +40,6 @@ void gauss(double** G, int n)
                 }
             }
 
-            // if (lmax > max) {
-            //     #pragma omp critical
-            //     {
-            //         if (lmax > max) {
-            //             max = lmax;
-            //             row = lrow;
-            //         }
-            //     }
-            // }
-            // #pragma omp barrier
 
             #pragma omp single
             {
@@ -80,46 +70,14 @@ void gauss(double** G, int n)
     }
 }
 
-// double** gauss_nomp(double** G, int n)
-// {
-//     double** U = CreateMat(n, n + 1);
-//     int i;
-//     for (i = 0; i < n; i++) {
-//         U[i] = memcpy(U[i], G[i], (n+1) * sizeof(double));
-//     }
-//     int k;
-//     for (k = 0; k < n - 1; k++) {
-//         double max = 0;
-//         int row = k;
-//         int p;
-//         for (p = k; p < n; p++) {
-//             if (fabs(U[p][k]) > max) {
-//                 max = fabs(U[p][k]);
-//                 row = p;
-//             }
-//         }
-//         double* swap = U[row];
-//         U[row] = U[k];
-//         U[k] = swap;
-
-//         int i;
-//         for (i = k + 1; i < n; i++) {
-//             double temp = U[i][k] / U[k][k];
-//             int j;
-//             for (j = k; j < n + 1; j++) {
-//                 U[i][j] = U[i][j] - temp * U[k][j];
-//             }
-//         }
-//     }
-//     return U;
-// }
 
 void jordan(double** U, int n)
 {
-    int k;
-    #pragma omp parallel for private(k)
+    int k, i;
+    // #pragma omp parallel for private(k)
     for (k = n -1; k >= 0; k--){
-        int i;
+        // int i;
+        // #pragma omp parallel for
         for (i = n-1 ; i >= 0; i--){
             if (i != k){
                 U[i][n]= U[i][n] - U[i][k] / U[k][k] * U[k][n];
