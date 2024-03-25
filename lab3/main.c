@@ -90,13 +90,14 @@ void jordan(double** U, int n)
 
 }
 
-int main(int argc, char* argv[])
+
+  int main(int argc, char* argv[])
 {
     int size;
     double** G;
     double t1;
     double t2;
-    double* x;
+    // double* x;
 
     // Read command-line arguments
     if (argc != 2){
@@ -115,7 +116,7 @@ int main(int argc, char* argv[])
     }
     
     // x = malloc(size * sizeof(double));
-    x = CreateVec(size);
+    // x = CreateVec(size);
 
     GET_TIME(t1);
     gauss(G, size);
@@ -125,7 +126,8 @@ int main(int argc, char* argv[])
     PrintMat(G, size, size + 1);
     fprintf(stderr, "%f\n", t2 - t1);
 
-    Lab3SaveOutput(x, size, t2-t1);
+    Lab3SaveOutput(*G, size, t2-t1);
+    // fprintf(G);
 
     return 0;
 }
