@@ -1,0 +1,36 @@
+Read me for ECE 420 Lab4 Script Kit
+Mar. 2024
+
+=====
+Overview:
+    There are four groups of scripts in this kit
+    
+-----
+    Data selection program and original data:
+    web-Standford.txt	original data
+    datatrim.c          source file to fetch a subset of the original data and pre-process it
+
+-----
+    Important functions:
+    timer.h        macro definition for the time measurement
+    Lab4IO.h       header for the Lab4IO.c, needs to be included if call the IOs directly from Lab4IO.c
+    Lab4IO.c       source file for the IO functions, needs to be referred in the compiler line if the functions are called in the program
+
+-----
+    Template script:
+    main_template.c  an incomplete serial implementation provided as a template (you may ignore this script if you want)
+
+-----
+    Verification program:
+    serialtester  executable file for the testing program.
+                  to use:
+                      1. run "sha256sum serialtester" and check that the output checksum is "598471b927d0d03e1ea0623dfeaeeb560efa0bcc5e22dc8680867111df59b341"
+                      2, run "chmod +x serialtester" to grant execution permission
+                      3. run "./serialtester" to verify the results
+                      note: 
+                      - do not run the serialtester if the checksum does not match (re-download the file if necessary)
+                      - the serialtester only works on the VM (it will probably not work on your local device)
+                      - make sure that "data_input_link", "data_input_meta", and "data_output" are consistent with each other
+=====
+Please also find the detailed instructions in the comments of the individual files.
+Web Graph data is from http://snap.stanford.edu/data/web-Stanford.html
